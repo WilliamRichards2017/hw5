@@ -119,8 +119,42 @@ class Table {
            .text(d => d["key"]);
 
 
-       let td = tr.selectAll("td").data(d => this.cellArray(d)).enter().append("td")
-           .text(d => d["val"]);
+       let td = tr.selectAll("td").data(d => this.cellArray(d)).enter().append("td");
+
+       let goals = td.filter((d) => {
+           return d.vis === "goals"
+       });
+
+        let bars = td.filter((d) => {
+            return d.vis === "bar";
+        });
+
+        let rounds = td.filter((d) => {
+            return d.vis === 'text'
+        });
+
+
+
+        console.log("filtered cell for rounds", rounds);
+
+        console.log("filtered cell for bars", bars);
+
+        console.log("filtered cell for goals", goals);
+
+
+
+
+        rounds.append("text")
+            .text(d => d["val"]);
+
+        bars.append("svg")
+            .attr("width", 50)
+            .attr("height", 12)
+            .append("rect")
+            .attr("font-size", d => console.log("d inside append rect", d))
+            .attr("width", d => d["val"] * 5)
+            .attr("height", d => 10)
+            .attr("fill", d  => "red");
 
 
 
@@ -184,11 +218,11 @@ class Table {
 
         let lc = this.makeCell("aggregate", "bar", value["Losses"]);
 
-        let tc = this.makeCell("aggregate", "bar", value["Total Games"]);
+        let tc = this.makeCell("aggregate", "bar", value["TotalGames"]);
 
-        console.log("goalcell", gc);
+        console.log("win cell", wc);
 
-        console.log("round cell", rc);
+        console.log("loss cell", lc);
 
 
         return [gc, rc, wc, lc, tc];
