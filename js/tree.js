@@ -47,6 +47,8 @@ class Tree {
             .range([0, height]);
 
 
+
+
         treeSvg.selectAll('circle.node')
             .data(root.descendants())
             .enter()
@@ -54,7 +56,17 @@ class Tree {
             .classed('node', true)
             .attr('cx', function(d) {return wScale(d.y);})
             .attr('cy', function(d) {return hScale(d.x);})
-            .attr('r', 4);
+            .attr('r', 4)
+            .attr("log", d => console.log("d", d))
+
+
+        treeSvg.selectAll("text.node")
+            .data(root.descendants())
+            .enter()
+            .append('text')
+            .text(d => d.data.Team)
+            .attr("x", function(d) {return wScale(d.y);})
+            .attr("y", function(d) {return hScale(d.x);});
 
         treeSvg
             .selectAll('line.link')
