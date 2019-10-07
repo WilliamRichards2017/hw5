@@ -16,8 +16,8 @@ class Tree {
 
         // ******* TODO: PART VI *******
 
-        let width = 600;
-        let height = 600;
+        let width = 500;
+        let height = 900;
 
         console.log("treeData", treeData);
 
@@ -54,9 +54,16 @@ class Tree {
             .enter()
             .append('circle')
             .classed('node', true)
-            .attr('cx', function(d) {return wScale(d.y);})
+            .attr('cx', function(d) {return wScale(d.y) + 15;})
             .attr('cy', function(d) {return hScale(d.x);})
             .attr('r', 4)
+            .attr("fill", d => {if(d.data.Wins === "0") {
+                     return "red"
+        }
+                else{
+                    return "blue"
+        }
+        })
             .attr("log", d => console.log("d", d))
 
 
@@ -65,8 +72,8 @@ class Tree {
             .enter()
             .append('text')
             .text(d => d.data.Team)
-            .attr("x", function(d) {return wScale(d.y);})
-            .attr("y", function(d) {return hScale(d.x);});
+            .attr("x", function(d) {return wScale(d.y) + 15;})
+            .attr("y", function(d) {return hScale(d.x) - 5;});
 
         treeSvg
             .selectAll('line.link')
@@ -74,9 +81,9 @@ class Tree {
             .enter()
             .append('line')
             .classed('link', true)
-            .attr('x1', function(d) {return wScale(d.source.y);})
+            .attr('x1', function(d) {return wScale(d.source.y) + 15;})
             .attr('y1', function(d) {return hScale(d.source.x);})
-            .attr('x2', function(d) {return wScale(d.target.y);})
+            .attr('x2', function(d) {return wScale(d.target.y) + 15;})
             .attr('y2', function(d) {return hScale(d.target.x);});
 
         //Create a tree and give it a size() of 800 by 300.
