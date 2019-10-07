@@ -62,7 +62,6 @@ class Table {
 
         //Update Scale Domains
 
-        console.log("teamData", this.teamData);
 
         let maxGoal = Math.max.apply(Math, this.teamData.map(d => d["value"]["Goals Made"]));
 
@@ -99,6 +98,9 @@ class Table {
         //Set sorting callback for clicking on Team header
         //Clicking on headers should also trigger collapseList() and updateTable().
 
+        this.tableElements = this.teamData;
+
+
     }
 
 
@@ -109,19 +111,35 @@ class Table {
         // ******* TODO: PART III *******
         //Create table rows
 
-        this.tableElements = this.teamData;
 
-       let tr = d3.select("#matchTable > tbody").selectAll("tr")
-            .data(this.tableElements)
-            .enter().append("tr");
+        console.log("this.tableElements", this.tableElements);
+
+
+       let tr = d3.select("#matchTable  tbody").selectAll("tr")
+            .data(this.tableElements);
+
+
+        tr.exit().remove();
+
+
+        tr = tr.enter().append("tr");
+
+        // EXIT
+        // Remove old elements as needed.
+
 
        let th = tr.append("th")
-           .text(d => d["key"]);
+           .text((d, i) =>  {if(this.tableElements[i]["value"]["type"] === "aggregate"){return this.tableElements[i]["key"] } else{
+               return "game"
+           }})
+           .on("click", (d,i) => this.updateList(i));
 
 
        let td = tr.selectAll("td").data(d => this.cellArray(d)).enter().append("td");
 
-       let goals = td.filter((d) => {
+
+
+        let goals = td.filter((d) => {
            return d.vis === "goals"
        });
 
@@ -134,27 +152,72 @@ class Table {
         });
 
 
-
-        console.log("filtered cell for rounds", rounds);
-
-        console.log("filtered cell for bars", bars);
-
-        console.log("filtered cell for goals", goals);
-
+        let games = td.filter(d => {return d.type === "game"});
 
 
 
         rounds.append("text")
             .text(d => d["val"]);
 
-        bars.append("svg")
+
+        //Todo:scale using td cellwidth and height values
+       let barSvgs = bars.append("svg")
+           .attr("class", "chart")
             .attr("width", 50)
-            .attr("height", 12)
+            .attr("height", 25);
+
+       let barHeight = 20;
+
+       barSvgs
             .append("rect")
-            .attr("font-size", d => console.log("d inside append rect", d))
             .attr("width", d => d["val"] * 5)
-            .attr("height", d => 10)
-            .attr("fill", d  => "red");
+            .attr("height", barHeight)
+            .attr("fill", "red")
+           .attr("opacity", d => d["val"]/7);
+
+
+        barSvgs
+            .append("text")
+            .style("fill", "black")
+            .attr("x", 0)
+            .attr("y", barHeight / 2 - 2)
+            .attr("dy", "6px")
+            .text(d => d["val"]);
+
+
+
+
+
+        let goalSvgs = goals.append("svg")
+            .attr("width", 200)
+            .attr("height", 25);
+
+
+        goalSvgs.append("rect")
+            .attr("width", d => Math.abs(d["val"]["GoalsConceded"] -d["val"]["GoalsMade"]) * 12.5)
+            .attr("height", 10)
+            .attr("x",d => Math.min(d["val"]["GoalsConceded"], d["val"]["GoalsMade"]) * 12.5)
+            .attr("y", 3)
+            .style("fill", d => d["val"]["GoalsMade"] - d["val"]["GoalsConceded"] > 0 ? "blue" : "red")
+            .attr("opacity", 0.5);
+
+
+        //Todo, translate circles to goal scale exactly
+        goalSvgs.append("circle")
+            .attr("r", 5)
+            .attr("cy", barHeight / 2 - 2)
+            .attr("cx",d => d["val"]["GoalsMade"] * 12.5)
+            .style("fill", "blue");
+
+
+        goalSvgs.append("circle")
+            .attr("r", 5)
+            .attr("cy", barHeight / 2 - 2)
+            .attr("cx",d => d["val"]["GoalsConceded"] * 12.5)
+            .style("fill", "red");
+
+
+
 
 
 
@@ -210,19 +273,19 @@ class Table {
 
         let type = value["type"];
 
-        let gc = this.makeCell("aggregate", "goals", {"GoalsMade" : value["Goals Made"], "GoalsConceded" : value["Goals Conceded"]});
+        console.log("type", type);
 
-        let rc = this.makeCell("aggregate", "text", value["Result"]["label"]);
+        let gc = this.makeCell(type, "goals", {"GoalsMade" : value["Goals Made"], "GoalsConceded" : value["Goals Conceded"]});
 
-        let wc = this.makeCell("aggregate", "bar", value["Wins"]);
+        let rc = this.makeCell(type, "text", value["Result"]["label"]);
 
-        let lc = this.makeCell("aggregate", "bar", value["Losses"]);
+        let wc = this.makeCell(type, "bar", value["Wins"]);
 
-        let tc = this.makeCell("aggregate", "bar", value["TotalGames"]);
+        let lc = this.makeCell(type, "bar", value["Losses"]);
 
-        console.log("win cell", wc);
+        let tc = this.makeCell(type, "bar", value["TotalGames"]);
 
-        console.log("loss cell", lc);
+
 
 
         return [gc, rc, wc, lc, tc];
@@ -234,6 +297,27 @@ class Table {
      */
     updateList(i) {
         // ******* TODO: PART IV *******
+
+        console.log("this.updateList called");
+
+        console.log("this.tableElements[i]", this.tableElements[i]);
+
+        console.log("i", i);
+
+        let games = this.tableElements[i]["value"]["games"];
+
+        console.log("games", games);
+
+        for(let g = 0; g <  games.length; g++){
+            this.tableElements.splice(i + g + 1, 0, games[g]);
+            console.log("i, g, games[g]", i, g, games[g]);
+        }
+
+        // this.tableElements.splice(i, 0, games);
+
+        console.log("this.tableElements", this.tableElements);
+
+        this.updateTable();
 
         //Only update list for aggregate clicks, not game clicks
 

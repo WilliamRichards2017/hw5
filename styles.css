@@ -148,6 +148,18 @@ header {
     float: left;
 }
 
+.barText{
+    fill: black;
+}
+
+
+.chart .barText {
+    text-anchor: start;
+    mix-blend-mode: difference;
+}
+
+
+
 #goalHeader{
     width: 200px;
     height: 50px;
