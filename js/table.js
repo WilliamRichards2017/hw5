@@ -93,6 +93,14 @@ class Table {
 
         // Set sorting callback for clicking on headers
 
+        let team = d3.select("#matchTable > thead > tr").selectAll("th");
+
+        let headers = d3.select("#matchTable thead > tr").selectAll("td")
+            .on("click", (d,i) => this.sortByCol(i));
+
+        console.log("headers", headers);
+        console.log("team", team);
+
 
         //Set sorting callback for clicking on Team header
         //Clicking on headers should also trigger collapseList() and updateTable().
@@ -344,6 +352,62 @@ class Table {
         return [gc, rc, wc, lc, tc];
     }
 
+
+
+
+    sortByCol(i){
+
+        let tr = d3.select("#matchTable > tbody").selectAll("tr");
+
+
+        if(i === 0) {
+            this.sortByGoalDiff();
+        }
+
+        this.updateTable();
+
+    }
+
+    sortByGoalDiff(){
+        let preSort = this.tableElements.slice(0);
+
+        this.tableElements.sort(function (a, b) {
+            if (a.value["Goals Made"] - a.value["Goals Conceded"] < b.value["Goals Made"] - b.value["Goals Conceded"]) {
+                return -1;
+            }
+            if (a.value["Goals Made"] - a.value["Goals Conceded"] > b.value["Goals Made"] - b.value["Goals Conceded"]) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
+
+
+        console.log("presort, tableElements", preSort, this.tableElements);
+
+        let arrEq = function arraysEqual(a1, a2) {
+            /* WARNING: arrays must not contain {objects} or behavior may be undefined */
+            return JSON.stringify(a1) == JSON.stringify(a2);
+        }
+
+
+        if (arrEq(preSort, this.tableElements)) {
+            console.log("presort, tableElements", preSort, this.tableElements);
+            console.log("must reverse sort");
+
+            this.tableElements.sort(function (a, b) {
+                if (a.value["Goals Made"] - a.value["Goals Conceded"] > b.value["Goals Made"] - b.value["Goals Conceded"]) {
+                    return -1;
+                }
+                if (a.value["Goals Made"] - a.value["Goals Conceded"] < b.value["Goals Made"] - b.value["Goals Conceded"]) {
+                    return 1;
+                }
+                // a must be equal to b
+                return 0;
+            });
+        }
+    }
+
     /**
      * Updates the global tableElements variable, with a row for each row to be rendered in the table.
      *
@@ -430,6 +494,15 @@ class Table {
      */
     collapseList() {
 
+        let te = [];
+
+        for(let i = 0; i < this.tableElements.length; i++){
+            if(this.tableElements[i].value.type === "aggregate"){
+                te.push(this.tableElements[i]);
+            }
+        }
+
+        this.tableElements = te;
         // ******* TODO: PART IV *******
 
     }
