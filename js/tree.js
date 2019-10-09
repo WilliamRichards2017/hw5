@@ -53,7 +53,6 @@ class Tree {
             .data(root.descendants())
             .enter()
             .append('circle')
-            .classed('node', true)
             .attr('cx', function(d) {return wScale(d.y) + 15;})
             .attr('cy', function(d) {return hScale(d.x);})
             .attr('r', 4)
@@ -64,9 +63,10 @@ class Tree {
                     return "blue"
         }
         })
-            .attr("log", d => console.log("d", d))
 
 
+
+        console.log("root", root);
         treeSvg.selectAll("text.node")
             .data(root.descendants())
             .enter()

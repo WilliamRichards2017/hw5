@@ -1,4 +1,3 @@
-/** Class implementing the table. */
 class Table {
     /**
      * Creates a Table Object
@@ -114,28 +113,45 @@ class Table {
 
         console.log("this.tableElements", this.tableElements);
 
+        let svgs = d3.select("#matchTable  tbody").selectAll("td").selectAll("svg").remove();
+
+
 
        let tr = d3.select("#matchTable  tbody").selectAll("tr")
-            .data(this.tableElements);
-
-
-        tr.exit().remove();
-
-
-        tr = tr.enter().append("tr");
-
+            .data(this.tableElements).join("tr");
         // EXIT
         // Remove old elements as needed.
 
+        console.log("this.tr", tr);
 
-       let th = tr.append("th")
-           .text((d, i) =>  {if(this.tableElements[i]["value"]["type"] === "aggregate"){return this.tableElements[i]["key"] } else{
-               return "game"
-           }})
-           .on("click", (d,i) => this.updateList(i));
+       let th = tr.selectAll("th").data(d => {return [d]; })
+           .join("th")
+           // .text((d, i) =>  {if(d["value"] === "aggregate"){return d["key"] } else{
+           //     return "game"
+           // }})
+           .on("click", (d,i) => this.updateList(d["key"]));
+
+        th.text(d => {
+            if(d.value.type === "aggregate"){
+                return  d["key"];
+            }
+            else{
+                return "  vs. " +  d["key"];
+            }
+        })
+            .style("color", d => {
+                if(d.value.type === "game"){
+                    return "gray";
+                }
+            });
 
 
-       let td = tr.selectAll("td").data(d => this.cellArray(d)).enter().append("td");
+        console.log("th", th);
+
+
+
+
+        let td = tr.selectAll("td").data(d => this.cellArray(d)).join("td");
 
 
 
@@ -156,7 +172,7 @@ class Table {
 
 
 
-        rounds.append("text")
+        rounds.join("text")
             .text(d => d["val"]);
 
 
@@ -196,9 +212,22 @@ class Table {
         goalSvgs.append("rect")
             .attr("width", d => Math.abs(d["val"]["GoalsConceded"] -d["val"]["GoalsMade"]) * 12.5)
             .attr("height", 10)
-            .attr("x",d => Math.min(d["val"]["GoalsConceded"], d["val"]["GoalsMade"]) * 12.5)
+            .attr("x",d =>  Math.min(d["val"]["GoalsConceded"], d["val"]["GoalsMade"]) * 12.5 )
             .attr("y", 3)
-            .style("fill", d => d["val"]["GoalsMade"] - d["val"]["GoalsConceded"] > 0 ? "blue" : "red")
+            .style("fill", d => {
+                if(d.type === "aggregate") {
+                    if (d.val.GoalsMade - d.val.GoalsConceded > 0) {
+                        return "blue";
+                    } else if (d.val.GoalsMade - d.val.GoalsConceded < 0) {
+                        return "red";
+                    } else {
+                        return "gray";
+                    }
+                }
+                    else{
+                        return "none";
+                }
+            })
             .attr("opacity", 0.5);
 
 
@@ -207,14 +236,40 @@ class Table {
             .attr("r", 5)
             .attr("cy", barHeight / 2 - 2)
             .attr("cx",d => d["val"]["GoalsMade"] * 12.5)
-            .style("fill", "blue");
+            .style("fill", d => {
+                if (d.type === "aggregate"){
+                    return "blue";
+                }
+                else{
+                    return "white";
+                }
+
+            })
+            .style("stroke", d =>{
+                if(d.type === "game"){
+                    return "blue";
+                }
+            });
 
 
         goalSvgs.append("circle")
             .attr("r", 5)
             .attr("cy", barHeight / 2 - 2)
             .attr("cx",d => d["val"]["GoalsConceded"] * 12.5)
-            .style("fill", "red");
+            .style("fill", d => {
+                if (d.type === "aggregate"){
+                    return "red"
+                }
+                else{
+                    return "white";
+                }
+
+            })
+            .style("stroke", d =>{
+                if(d.type === "game"){
+                    return "red";
+                }
+            });
 
 
 
@@ -273,8 +328,6 @@ class Table {
 
         let type = value["type"];
 
-        console.log("type", type);
-
         let gc = this.makeCell(type, "goals", {"GoalsMade" : value["Goals Made"], "GoalsConceded" : value["Goals Conceded"]});
 
         let rc = this.makeCell(type, "text", value["Result"]["label"]);
@@ -295,33 +348,81 @@ class Table {
      * Updates the global tableElements variable, with a row for each row to be rendered in the table.
      *
      */
-    updateList(i) {
+    updateList(country) {
+
+        let i = this.getIndexFromList(country);
         // ******* TODO: PART IV *******
 
-        console.log("this.updateList called");
+        console.log("index passed to update list", i);
 
-        console.log("this.tableElements[i]", this.tableElements[i]);
+        let type = this.tableElements[i].value.type;
 
-        console.log("i", i);
-
-        let games = this.tableElements[i]["value"]["games"];
-
-        console.log("games", games);
-
-        for(let g = 0; g <  games.length; g++){
-            this.tableElements.splice(i + g + 1, 0, games[g]);
-            console.log("i, g, games[g]", i, g, games[g]);
+        if("type" === "game"){
+            return;
         }
 
-        // this.tableElements.splice(i, 0, games);
 
-        console.log("this.tableElements", this.tableElements);
+        let typeOfNext = this.tableElements[i+1].value.type;
+
+
+
+        //console.log("this.tableElements[i]", this.tableElements[i]);
+
+
+
+        if(type === "aggregate" && typeOfNext === "aggregate") {
+            let games = this.tableElements[i]["value"]["games"];
+
+            for (let g = 0; g < games.length; g++) {
+                this.tableElements.splice(i + g + 1, 0, games[g]);
+                console.log("i, g, games[g]", i, g, games[g]);
+            }
+        }
+
+        else if(type === "aggregate" && typeOfNext === "game"){
+
+            this.tableElements = this.collapseTeam(i);
+
+            // console.log("this.tableElements after collapse", this.tableElements);
+        }
+
 
         this.updateTable();
 
         //Only update list for aggregate clicks, not game clicks
 
     }
+
+    getIndexFromList(country){
+        console.log("getting index for country", country);
+        console.log(this.tableElements);
+
+        let index = this.tableElements.findIndex(p => p.key === country);
+
+        console.log("index", index);
+
+        return index;
+
+    }
+
+    collapseTeam(i){
+        console.log("collapsing team at index ", i);
+
+        // console.log("this.tableElements[i+1]", this.tableElements[i+1].value);
+
+        let te = this.tableElements[i+1];
+
+
+        while(te.value.type === "game"){
+            console.log("first te", te);
+            this.tableElements.splice(i+1, 1);
+            console.log("this.tableELements after splice", this.tableElements)
+            te = this.tableElements[i+1];
+            console.log("next te", te);
+        }
+        return this.tableElements;
+    }
+
 
     /**
      * Collapses all expanded countries, leaving only rows for aggregate values per country.
