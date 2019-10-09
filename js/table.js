@@ -93,7 +93,8 @@ class Table {
 
         // Set sorting callback for clicking on headers
 
-        let team = d3.select("#matchTable > thead > tr").selectAll("th");
+        let team = d3.select("#matchTable > thead > tr").selectAll("th")
+        .on("click", (d,i) => this.sortByCol(5));
 
         let headers = d3.select("#matchTable thead > tr").selectAll("td")
             .on("click", (d,i) => this.sortByCol(i));
@@ -363,8 +364,21 @@ class Table {
         if(i === 0) {
             this.sortByGoalDiff();
         }
-        if(i === 1){
+        else if(i === 1){
             this.sortByRound();
+        }
+        else if(i === 2){
+            this.sortByWins();
+        }
+        else if(i === 3){
+            this.sortByLosses();
+        }
+        else if (i === 4){
+            this.sortByTotalGames()
+        }
+
+        else if (i === 5){
+            this.sortByTeamName();
         }
 
         this.updateTable();
@@ -399,18 +413,12 @@ class Table {
     }
 
     sortByRound(){
-
-
-        let roundPoints = ["Group", "Round of Sixteen", "Quarter Finals", "Fourth Place", "Third Place", "Runner Up", "Winner"];
-
         let preSort = this.tableElements.slice(0);
 
         this.tableElements.sort(function (a, b) {
 
             let aPoint = a.value.Result.ranking;
             let bPoint = b.value.Result.ranking;
-
-
 
             console.log("aPoint", aPoint)
 
@@ -435,6 +443,137 @@ class Table {
         if (arrEq(preSort, this.tableElements)) {
             this.tableElements.reverse();
         }
+    }
+
+    sortByWins(){
+        let preSort = this.tableElements.slice(0);
+
+        this.tableElements.sort(function (a, b) {
+
+            let aPoint = a.value.Wins;
+            let bPoint = b.value.Wins;
+
+            console.log("aPoint", aPoint)
+
+            if (aPoint< bPoint) {
+                return -1;
+            }
+            if (bPoint < aPoint) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
+
+        console.log("presort, tableElements", preSort, this.tableElements);
+
+        let arrEq = function arraysEqual(a1, a2) {
+            /* WARNING: arrays must not contain {objects} or behavior may be undefined */
+            return JSON.stringify(a1) == JSON.stringify(a2);
+        }
+
+
+        if (arrEq(preSort, this.tableElements)) {
+            this.tableElements.reverse();
+        }
+
+    }
+
+    sortByLosses(){
+
+        let preSort = this.tableElements.slice(0);
+
+        this.tableElements.sort(function (a, b) {
+
+            let aPoint = a.value.Losses;
+            let bPoint = b.value.Losses;
+
+            console.log("aPoint", aPoint)
+
+            if (aPoint< bPoint) {
+                return -1;
+            }
+            if (bPoint < aPoint) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
+
+        console.log("presort, tableElements", preSort, this.tableElements);
+
+        let arrEq = function arraysEqual(a1, a2) {
+            /* WARNING: arrays must not contain {objects} or behavior may be undefined */
+            return JSON.stringify(a1) == JSON.stringify(a2);
+        }
+
+
+        if (arrEq(preSort, this.tableElements)) {
+            this.tableElements.reverse();
+        }
+
+    }
+
+    sortByTotalGames(){
+        let preSort = this.tableElements.slice(0);
+
+        this.tableElements.sort(function (a, b) {
+
+            let aPoint = a.value["Total Games"];
+            let bPoint = b.value["Total Games"];
+
+            console.log("aPoint", aPoint);
+
+            if (aPoint< bPoint) {
+                return -1;
+            }
+            if (bPoint < aPoint) {
+                return 1;
+            }
+            // a must be equal to b
+            return 0;
+        });
+
+        console.log("presort, tableElements", preSort, this.tableElements);
+
+        let arrEq = function arraysEqual(a1, a2) {
+            /* WARNING: arrays must not contain {objects} or behavior may be undefined */
+            return JSON.stringify(a1) == JSON.stringify(a2);
+        }
+
+
+        if (arrEq(preSort, this.tableElements)) {
+            this.tableElements.reverse();
+        }
+
+    }
+
+    sortByTeamName(){
+
+        let preSort = this.tableElements.slice(0);
+
+        this.tableElements.sort(function (a, b) {
+
+
+            let aPoint = a.key;
+            let bPoint = b.key;
+
+
+            return aPoint.localeCompare(bPoint);
+        });
+
+        console.log("presort, tableElements", preSort, this.tableElements);
+
+        let arrEq = function arraysEqual(a1, a2) {
+            /* WARNING: arrays must not contain {objects} or behavior may be undefined */
+            return JSON.stringify(a1) == JSON.stringify(a2);
+        }
+
+
+        if (arrEq(preSort, this.tableElements)) {
+            this.tableElements.reverse();
+        }
+
     }
 
     /**
