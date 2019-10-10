@@ -24,6 +24,13 @@ d3.json('data/fifa-matches-2018.json').then( data => {
 
         table.createTable();
         table.updateTable();
+
+        let rows = d3.select("#matchTable > tbody").selectAll("tr")
+            .on("mouseover", d => tree.updateTree(d))
+            .on("mouseout",d => tree.clearTree());
+
+
+
     });
 });
 

@@ -358,6 +358,8 @@ class Table {
 
     sortByCol(i){
 
+        this.collapseList();
+
         let tr = d3.select("#matchTable > tbody").selectAll("tr");
 
 
@@ -399,7 +401,7 @@ class Table {
             return 0;
         });
 
-        console.log("presort, tableElements", preSort, this.tableElements);
+        // console.log("presort, tableElements", preSort, this.tableElements);
 
         let arrEq = function arraysEqual(a1, a2) {
             /* WARNING: arrays must not contain {objects} or behavior may be undefined */
@@ -420,7 +422,6 @@ class Table {
             let aPoint = a.value.Result.ranking;
             let bPoint = b.value.Result.ranking;
 
-            console.log("aPoint", aPoint)
 
             if (aPoint< bPoint) {
                 return -1;
@@ -432,7 +433,6 @@ class Table {
             return 0;
         });
 
-        console.log("presort, tableElements", preSort, this.tableElements);
 
         let arrEq = function arraysEqual(a1, a2) {
             /* WARNING: arrays must not contain {objects} or behavior may be undefined */
@@ -453,7 +453,6 @@ class Table {
             let aPoint = a.value.Wins;
             let bPoint = b.value.Wins;
 
-            console.log("aPoint", aPoint)
 
             if (aPoint< bPoint) {
                 return -1;
@@ -464,8 +463,6 @@ class Table {
             // a must be equal to b
             return 0;
         });
-
-        console.log("presort, tableElements", preSort, this.tableElements);
 
         let arrEq = function arraysEqual(a1, a2) {
             /* WARNING: arrays must not contain {objects} or behavior may be undefined */
@@ -488,7 +485,6 @@ class Table {
             let aPoint = a.value.Losses;
             let bPoint = b.value.Losses;
 
-            console.log("aPoint", aPoint)
 
             if (aPoint< bPoint) {
                 return -1;
@@ -499,8 +495,6 @@ class Table {
             // a must be equal to b
             return 0;
         });
-
-        console.log("presort, tableElements", preSort, this.tableElements);
 
         let arrEq = function arraysEqual(a1, a2) {
             /* WARNING: arrays must not contain {objects} or behavior may be undefined */
@@ -522,7 +516,6 @@ class Table {
             let aPoint = a.value["Total Games"];
             let bPoint = b.value["Total Games"];
 
-            console.log("aPoint", aPoint);
 
             if (aPoint< bPoint) {
                 return -1;
@@ -533,8 +526,6 @@ class Table {
             // a must be equal to b
             return 0;
         });
-
-        console.log("presort, tableElements", preSort, this.tableElements);
 
         let arrEq = function arraysEqual(a1, a2) {
             /* WARNING: arrays must not contain {objects} or behavior may be undefined */
@@ -562,7 +553,6 @@ class Table {
             return aPoint.localeCompare(bPoint);
         });
 
-        console.log("presort, tableElements", preSort, this.tableElements);
 
         let arrEq = function arraysEqual(a1, a2) {
             /* WARNING: arrays must not contain {objects} or behavior may be undefined */
@@ -582,10 +572,9 @@ class Table {
      */
     updateList(country) {
 
-        let i = this.getIndexFromList(country);
-        // ******* TODO: PART IV *******
+        //todo: fix last element edge case
 
-        console.log("index passed to update list", i);
+        let i = this.getIndexFromList(country);
 
         let type = this.tableElements[i].value.type;
 
@@ -594,12 +583,9 @@ class Table {
         }
 
 
+
+
         let typeOfNext = this.tableElements[i+1].value.type;
-
-
-
-        //console.log("this.tableElements[i]", this.tableElements[i]);
-
 
 
         if(type === "aggregate" && typeOfNext === "aggregate") {

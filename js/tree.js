@@ -75,6 +75,15 @@ class Tree {
             .attr("x", function(d) {return wScale(d.y) + 15;})
             .attr("y", function(d) {return hScale(d.x) - 5;});
 
+
+
+        let croatia = treeSvg.selectAll("text")
+            .filter(function(){
+                return d3.select(this).text() == "Croatia"
+            })
+
+        console.log("croatia", croatia)
+
         treeSvg
             .selectAll('line.link')
             .data(root.links())
@@ -101,8 +110,24 @@ class Tree {
      *
      * @param row a string specifying which team was selected in the table.
      */
-    updateTree(row) {
+    updateTree(d) {
         // ******* TODO: PART VII *******
+
+        let selectedCountry = d.key;
+
+        console.log("selectedCountry", selectedCountry);
+
+        let treeSvg = d3.select("#tree");
+
+        let linksToHighlight = treeSvg.selectAll('line.link').filter((dl) => {
+            console.log("dl", dl);
+            return dl.target.data.Team === selectedCountry;
+        }).style("stroke", "red");
+
+        console.log("links to highlight", linksToHighlight);
+
+        linksToHighlight
+
 
     }
 
@@ -111,7 +136,8 @@ class Tree {
      */
     clearTree() {
         // ******* TODO: PART VII *******
+        let nodesToClear = d3.select("#tree").selectAll('line.link')
+            .style("stroke", "black");
 
-        // You only need two lines of code for this! No loops!
     }
 }
