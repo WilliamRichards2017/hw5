@@ -111,22 +111,16 @@ class Tree {
      * @param row a string specifying which team was selected in the table.
      */
     updateTree(d) {
-        // ******* TODO: PART VII *******
 
-        let selectedCountry = d.key;
-
-        console.log("selectedCountry", selectedCountry);
-
-        let treeSvg = d3.select("#tree");
-
-        let linksToHighlight = treeSvg.selectAll('line.link').filter((dl) => {
-            console.log("dl", dl);
-            return dl.target.data.Team === selectedCountry;
+        d3.select("#tree").selectAll('line.link').filter((dl) => {
+            return dl.target.data.Team === d.key;
         }).style("stroke", "red");
 
-        console.log("links to highlight", linksToHighlight);
 
-        linksToHighlight
+        d3.select("#tree").selectAll("text").filter((dt) => {
+            console.log("dt", dt);
+            return dt.data.Team === d.key;
+        }).style("stroke", "red");
 
 
     }
@@ -136,8 +130,12 @@ class Tree {
      */
     clearTree() {
         // ******* TODO: PART VII *******
-        let nodesToClear = d3.select("#tree").selectAll('line.link')
+        d3.select("#tree").selectAll('line.link')
             .style("stroke", "black");
+
+        d3.select("#tree").selectAll("text")
+            .style("stroke", "black");
+
 
     }
 }
