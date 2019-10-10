@@ -246,7 +246,10 @@ class Table {
             .attr("cy", barHeight / 2 - 2)
             .attr("cx",d => d["val"]["GoalsMade"] * 12.5)
             .style("fill", d => {
-                if (d.type === "aggregate"){
+                if(d.val.GoalsConceded === d.val.GoalsMade){
+                    return "gray";
+                }
+                else if (d.type === "aggregate"){
                     return "blue";
                 }
                 else{
@@ -266,7 +269,10 @@ class Table {
             .attr("cy", barHeight / 2 - 2)
             .attr("cx",d => d["val"]["GoalsConceded"] * 12.5)
             .style("fill", d => {
-                if (d.type === "aggregate"){
+                if(d.val.GoalsConceded === d.val.GoalsMade){
+                    return "gray";
+                }
+                else if (d.type === "aggregate"){
                     return "red"
                 }
                 else{
@@ -582,14 +588,25 @@ class Table {
             return;
         }
 
+        console.log("this.tableElements[i+1]", this.tableElements[i+1]);
+
+        let games = this.tableElements[i]["value"]["games"];
 
 
+        if(typeof this.tableElements[i+1] === "undefined"){
+            console.log("undefined table element");
+            for (let g = 0; g < games.length; g++) {
+                this.tableElements.splice(i + g + 1, 0, games[g]);
+                console.log("i, g, games[g]", i, g, games[g]);
+            }
+            this.updateTable();
+            return;
+        }
 
         let typeOfNext = this.tableElements[i+1].value.type;
 
 
         if(type === "aggregate" && typeOfNext === "aggregate") {
-            let games = this.tableElements[i]["value"]["games"];
 
             for (let g = 0; g < games.length; g++) {
                 this.tableElements.splice(i + g + 1, 0, games[g]);
@@ -636,6 +653,9 @@ class Table {
             this.tableElements.splice(i+1, 1);
             console.log("this.tableELements after splice", this.tableElements)
             te = this.tableElements[i+1];
+            if(typeof te === "undefined"){
+                return this.tableElements;
+            }
             console.log("next te", te);
         }
         return this.tableElements;
